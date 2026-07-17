@@ -49,7 +49,6 @@ function PandaLogo() {
 export default function App() {
   const [current, setCurrent] = useState(0);
   const [scale, setScale] = useState(1);
-  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const update = () => setScale(window.innerWidth / 1440);
@@ -62,13 +61,6 @@ export default function App() {
     setCurrent(((to % 4) + 4) % 4);
   }, []);
 
-  // Auto-advance every 5 s unless user is hovering
-  useEffect(() => {
-    if (paused) return;
-    const t = setTimeout(() => advance(current + 1), 5000);
-    return () => clearTimeout(t);
-  }, [current, paused, advance]);
-
   const isHero = current === 0;
   const slide = SLIDES[current];
 
@@ -80,9 +72,9 @@ export default function App() {
         overflow: "hidden",
         position: "relative",
         backgroundColor: "#1a0012",
+        cursor: "pointer",
       }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      onClick={() => advance(current + 1)}
     >
       {/* Fixed 1440×800 canvas, scaled to viewport */}
       <div
@@ -259,29 +251,30 @@ export default function App() {
           <p
             style={{
               color: "white",
-              fontFamily: '"Barlow Condensed", sans-serif',
-              fontWeight: 700,
-              fontSize: 60,
+              fontFamily: '"Plus Jakarta Sans", sans-serif',
+              fontWeight: 800,
+              fontSize: 61,
               lineHeight: "73px",
               textTransform: "uppercase",
-              width: 796,
+              width: 1150,
               margin: 0,
-              letterSpacing: "-0.2px",
+              letterSpacing: "-0.5px",
             }}
           >
-            One financial home for life across borders.
+            One financial home for<br />life across borders.
           </p>
         </motion.div>
 
         {/* ── Slides 1-3: Centered transfer amount ─────────────────── */}
         <motion.div
-          animate={{ opacity: isHero ? 0 : 1, y: isHero ? -24 : 0 }}
+          animate={{ opacity: isHero ? 0 : 1 }}
           transition={{ duration: 0.55, ease: "easeInOut" }}
           style={{
             position: "absolute",
             left: "50%",
             top: 340,
-            transform: "translate(-50%, -50%)",
+            x: "-50%",
+            y: "-50%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -328,89 +321,6 @@ export default function App() {
           </motion.p>
         </motion.div>
 
-        {/* ── Arrow navigation ─────────────────────────────────────── */}
-        {[
-          { dir: -1, side: "left" as const, symbol: "‹" },
-          { dir: 1, side: "right" as const, symbol: "›" },
-        ].map(({ dir, side, symbol }) => (
-          <button
-            key={side}
-            onClick={() => advance(current + dir)}
-            style={{
-              position: "absolute",
-              [side]: 28,
-              top: "50%",
-              transform: "translateY(-50%)",
-              backgroundColor: "rgba(255,255,255,0.15)",
-              border: "1px solid rgba(255,255,255,0.25)",
-              borderRadius: "50%",
-              width: 48,
-              height: 48,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 20,
-              color: "white",
-              fontSize: 26,
-              lineHeight: 1,
-              backdropFilter: "blur(6px)",
-            }}
-          >
-            {symbol}
-          </button>
-        ))}
-
-        {/* ── Progress dots ─────────────────────────────────────────── */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 36,
-            left: "50%",
-            transform: "translateX(-50%)",
-            display: "flex",
-            gap: 8,
-            zIndex: 20,
-          }}
-        >
-          {SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => advance(i)}
-              style={{
-                height: 8,
-                width: i === current ? 30 : 8,
-                borderRadius: 4,
-                backgroundColor:
-                  i === current ? "white" : "rgba(255,255,255,0.35)",
-                border: "none",
-                cursor: "pointer",
-                padding: 0,
-                transition: "width 0.35s ease, background-color 0.35s ease",
-              }}
-            />
-          ))}
-        </div>
-
-        {/* ── Auto-progress bar ─────────────────────────────────────── */}
-        {!paused && (
-          <motion.div
-            key={current}
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 5, ease: "linear" }}
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              height: 3,
-              width: "100%",
-              backgroundColor: "rgba(255,255,255,0.5)",
-              transformOrigin: "left center",
-              zIndex: 25,
-            }}
-          />
-        )}
       </div>
     </div>
   );
